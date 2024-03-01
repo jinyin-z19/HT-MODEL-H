@@ -8,6 +8,13 @@ using namespace std;
 extern "C" {
 
 void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_leg_angle[]) {
+    /* 
+    input:
+        leg_lenth :: lap leg foot ankle(d L1 h1 h2)
+        end_pos :: x y z roll pitch yaw
+    output:
+        st_leg_angle :: joint angle , theta 0 - 5
+    */
     Eigen::Matrix3d R_t;
     R_t = Eigen::AngleAxisd(end_pos[5], Eigen::Vector3d::UnitZ()) * 
           Eigen::AngleAxisd(end_pos[4], Eigen::Vector3d::UnitY()) * 
@@ -65,6 +72,43 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
        st_leg_angle[1] = oy;
        st_leg_angle[2] = atan2(Rlap(1,0)/cos(oy), Rlap(0,0)/cos(oy));
        }
+ 
+    // parallel ankle caculate reference -> git@github.com:rocketman123456/ros2_ws.git
+    double tx = st_leg_angle[4];
+    double ty = st_leg_angle[5];
+    double d = leg_lenth[3];
+    double L1 = leg_lenth[4];
+    double h1 = leg_lenth[5];
+    double h2 = leg_lenth[6];
+    
+    double cx = cos(tx);
+    double sx = sin(tx);
+    double cy = cos(ty);
+    double sy = sin(ty);
+
+    double AL = - L1 * L1 * cy + L1 * d * sx * sy;
+    double BL = - L1 * L1 * sy + L1 * h1 - L1 * d * sx * cy;
+    double CL = -(L1 * L1 + d * d - d * d *cx - L1 * h1 * sy - d * h1 * sx * cy);
+
+    double LenL = sqrt(AL * AL + BL * BL);
+
+    double AR = - L1 * L1 * cy - L1 * d * sx * sy;
+    double BR = - L1 * L1 * sy + L1 * h2 + L1 * d * sx * cy;
+    double CR = -(L1 * L1 + d * d - d * d *cx - L1 * h2 * sy + d * h2 * sx * cy);
+
+    double LenR = sqrt(AR * AR + BR * BR);
+
+    if (LenL <= abs(CL) || LenR <= abs(CR))
+    {
+        st_leg_angle[4] = 0;
+        st_leg_angle[5] = 0;
+    }
+    else
+    {
+        st_leg_angle[4] = asin(CL / LenL) - asin(AL / LenL);
+        st_leg_angle[5] = asin(CR / LenR) - asin(AR / LenR);
+    }
+    
     // motor way
     for(int i = 0; i < 6; i++){
        st_leg_angle[i] *= motor_way[i];
