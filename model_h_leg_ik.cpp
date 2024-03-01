@@ -58,7 +58,7 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
     double oy = atan2(-Rlap(2,0), v_y.norm());
 
     if (oy >= PI/2 - err && oy <= PI/2 + err){
-       st_leg_angle[0] = atan2(Rlap(0,1), Rlap(0,2));
+       st_leg_angle[0] = atan2(-Rlap(0,1), Rlap(0,2));
        st_leg_angle[1] = PI/2;
        st_leg_angle[2] = 0.0;
        }
@@ -76,7 +76,7 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
     // parallel ankle caculate reference -> git@github.com:rocketman123456/ros2_ws.git
     double tx = st_leg_angle[4];
     double ty = st_leg_angle[5];
-    double d = leg_lenth[3];
+    double d =  leg_lenth[3];
     double L1 = leg_lenth[4];
     double h1 = leg_lenth[5];
     double h2 = leg_lenth[6];
@@ -108,6 +108,9 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
         st_leg_angle[4] = asin(CL / LenL) - asin(AL / LenL);
         st_leg_angle[5] = asin(CR / LenR) - asin(AR / LenR);
     }
+    
+    // parallel lap caculate
+    st_leg_angle[3] = st_leg_angle[3] - st_leg_angle[2];
     
     // motor way
     for(int i = 0; i < 6; i++){
