@@ -11,7 +11,7 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
     /* 
     input:
         leg_lenth :: lap leg foot ankle(d L1 h1 h2)
-        end_pos :: x y z roll pitch yaw
+        end_pos :: x(front) y(left) z(up) roll pitch yaw
     output:
         st_leg_angle :: joint angle , theta 0 - 5
     */
@@ -52,26 +52,11 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
             Eigen::AngleAxisd(st_leg_angle[4] + st_leg_angle[3], Eigen::Vector3d::UnitY());
     Eigen::Matrix3d Rlap = R_345.transpose() * R_ti;
     
-    //prevent lock
-    double err = 0.001;
-    Eigen::Vector2d v_y(Rlap(0,0), Rlap(1,0));
-    double oy = atan2(-Rlap(2,0), v_y.norm());
-
-    if (oy >= PI/2 - err && oy <= PI/2 + err){
-       st_leg_angle[0] = atan2(-Rlap(0,1), Rlap(0,2));
-       st_leg_angle[1] = PI/2;
-       st_leg_angle[2] = 0.0;
-       }
-    else if (oy >= -(PI/2) - err && oy <= -(PI/2) + err){
-       st_leg_angle[0] = atan2(-Rlap(0,1), -Rlap(0,2));
-       st_leg_angle[1] = -PI/2;
-       st_leg_angle[2] = 0.0;
-       }
-    else{
-       st_leg_angle[0] = atan2(Rlap(2,1)/cos(oy), Rlap(2,2)/cos(oy));
-       st_leg_angle[1] = oy;
-       st_leg_angle[2] = atan2(Rlap(1,0)/cos(oy), Rlap(0,0)/cos(oy));
-       }
+    //ZXY EULAR
+    Eigen::Vector3d vec_ZXY = Rlap.eulerAngles(2, 0, 1);
+    st_leg_angle[0] = vec_ZXY[0];
+    st_leg_angle[1] = vec_ZXY[1];
+    st_leg_angle[2] = vec_ZXY[2];
  
     // parallel ankle caculate reference -> git@github.com:rocketman123456/ros2_ws.git
     double tx = st_leg_angle[4];

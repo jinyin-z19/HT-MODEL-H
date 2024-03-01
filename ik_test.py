@@ -18,7 +18,7 @@ lib.leg_ik.restype = None
 
 class ModelHLegIK:
     """inverse kinematics for two leg"""
-    def __init__(self, way_left = [1.0,-1.0,-1.0,-1.0,-1.0,-1.0], way_right = [1.0,1.0,-1.0,1.0,1.0,-1.0],leg_rod_length = [0.15,0.16,0.0255,0.0643,0.022,0.112,0.065]):
+    def __init__(self, way_left = [1.0,-1.0,1.0,1.0,-1.0,-1.0], way_right = [1.0,1.0,-1.0,1.0,1.0,-1.0],leg_rod_length = [0.15,0.16,0.0255,0.03215,0.022,0.112,0.065]):
         """
         initialize class
         """
@@ -60,5 +60,21 @@ class ModelHLegIK:
                
 if __name__ == '__main__':
     leg_1 = ModelHLegIK()
-    a = leg_1.LegIKMove("left",[0, 0, -0.3355, 0, 0, 0.3])
-    print(np.array(a) * 180 / np.pi)
+    a = leg_1.LegIKMove("left",[-0.3355, 0, 0, 0 , -np.pi/2 , 0])
+    print(np.array(a))
+    a = leg_1.LegIKMove("left",[0, -0.3355, 0, -np.pi/2, 0, 0])
+    print(np.array(a))
+    a = leg_1.LegIKMove("left",[0, 0, -0.3355, 0, 0, -np.pi/2])
+    print(np.array(a))
+    a = leg_1.LegIKMove("left",[0, 0.05, -0.30, 0, 0, 0])
+    print(np.array(a)/np.pi*180)
+    a = leg_1.LegIKMove("left",[0, -0.05, -0.30, 0, 0, 0])
+    print(np.array(a)/np.pi*180)
+    a = leg_1.LegIKMove("left",[0, 0.0001, -0.31, 0, 0, 0])
+    print(np.array(a)/np.pi*180)
+    a = leg_1.LegIKMove("left",[0, -0.0001, -0.31, 0, 0, 0])
+    print(np.array(a)/np.pi*180)
+    a = leg_1.LegIKMove("left",[0, 0, -0.30, 0, 0, 0])
+    print(np.array(a)/np.pi*180)
+    a = leg_1.LegIKMove("left",[0, -0, -0.30, 0, 0, 0])
+    print(np.array(a)/np.pi*180)
