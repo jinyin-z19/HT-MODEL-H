@@ -161,7 +161,7 @@ public:
     void set_motor_torque(int8_t motor_id, int32_t torque);
 
     int32_t transfer_send(tranfer_send_type_e type, float data);
-    float transfer_rec(tranfer_send_type_e type, int32_t data);
+    float transfer_rec(tranfer_rec_type_e type, int32_t data);
 
 private:
     

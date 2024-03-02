@@ -20,30 +20,14 @@ SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_LIST_DIR}/build)
 add_library(${SDK_DYNAMIC_LIB}
             SHARED 
             src/Livelybot_Driver.cpp
+            src/Motor_Control.cpp
 )
-
-# 设置动态链接库版本号
-# set_target_properties(${SDK_DYNAMIC_LIB} PROPERTIES VERSION 0.0.1 SOVERSION 1)
-
  
 # 包含指定头文件所在的目录
 target_include_directories(${SDK_DYNAMIC_LIB}
                             PUBLIC
                             ${PROJECT_SOURCE_DIR}/include
 )
- 
-# 设置安装库文件和头文件的路径
-# set(CMAKE_INSTALL_INCLUDEDIR ${PROJECT_SOURCE_DIR}/build/install)
- 
-# make install头文件
-# install(DIRECTORY include/
-#         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/include
-# )
- 
-# make install库文件
-# install(DIRECTORY ${LIBRARY_OUTPUT_PATH}
-#         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lib
-# )
  
 # 创建测试动态链接库应用程序
 add_executable(${EXAMPLE} 

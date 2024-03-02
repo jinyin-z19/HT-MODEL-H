@@ -251,7 +251,7 @@ int32_t Livelybot_Driver::transfer_send(tranfer_send_type_e type, float data)
     return ERROR_TRANSFER_DATA;
 }
 
-float Livelybot_Driver::transfer_rec(tranfer_send_type_e type, int32_t data)
+float Livelybot_Driver::transfer_rec(tranfer_rec_type_e type, int32_t data)
 {
     float res = 0;
     switch (type)
