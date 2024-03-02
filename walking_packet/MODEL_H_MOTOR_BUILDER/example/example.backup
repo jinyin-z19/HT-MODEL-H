@@ -1,0 +1,175 @@
+#include "Livelybot_Driver.h"
+#include <time.h>
+
+#define ALL_MOTOR_NUM (CAN1_NUM+CAN2_NUM)
+
+#define MYTIMES 100000
+
+//例子
+void delay_ms(int milliseconds) {
+    struct timespec ts;
+    ts.tv_sec = milliseconds / 1000;
+    ts.tv_nsec = ((milliseconds) % 1000) * 1000000;
+    nanosleep(&ts, NULL);
+}
+
+void joint_test(void)
+{
+    int32_t add_pos = 0;
+    imu_space_s imu_data;
+    motor_fb_space_s motor_state;
+    bool spi_flag = false;
+
+    //创建Liveltbot_Driver对象,传入参数
+    Livelybot_Driver my_Driver("/dev/spidev4.1");
+    
+    int32_t init_pos[ALL_MOTOR_NUM] = {0};
+	
+
+    my_Driver.spi_send();
+    
+    for(uint8_t i = 0; i < CAN1_NUM; i++)
+    {
+        uint8_t temp_id = 0x10 | (i+1); 
+        init_pos[i] =  my_Driver.get_motor_state(temp_id).position;
+        printf("m0x%02x: %d\t", temp_id, init_pos[i]);
+        my_Driver.set_motor_position(temp_id, init_pos[i] + add_pos);
+    }
+
+    for(uint8_t i = 0; i < CAN2_NUM; i++)
+    {
+        uint8_t temp_id = 0x20 | (i+1); 
+        init_pos[i + CAN1_NUM] =  my_Driver.get_motor_state(temp_id).position;
+        printf("m0x%02x: %d\t", temp_id, init_pos[i + CAN1_NUM]);
+        my_Driver.set_motor_position(temp_id, init_pos[i + CAN1_NUM] + add_pos);
+    }
+    printf("\n");
+
+    delay_ms(2000);
+    spi_flag = my_Driver.spi_send();
+
+    int32_t target_pos = my_Driver.transfer_send(ANG2POS, 5);
+    int32_t get_add_cnt=0;
+    for(int times = 0; times < 10; times++)
+    {
+
+        while(add_pos < target_pos)
+        {
+            // delay_ms(1);
+            // 设置can1线id为1的电机的位置
+            for(uint8_t i = 0; i < CAN1_NUM; i++)
+            {
+                uint8_t temp_id = 0x10 | (i+1); 
+                // printf("motor0x%02x pos:%d\n", temp_id, my_Driver.get_motor_state(temp_id).position);
+                my_Driver.set_motor_position(temp_id, init_pos[i] + add_pos);
+            }
+
+            for(uint8_t i = 0; i < CAN2_NUM; i++)
+            {
+                uint8_t temp_id = 0x20 | (i+1); 
+                // printf("motor0x%02x pos:%d\n", temp_id, my_Driver.get_motor_state(temp_id).position);
+                my_Driver.set_motor_position(temp_id, init_pos[i + CAN1_NUM] + add_pos);
+            }
+
+            //发送指令
+            spi_flag = my_Driver.spi_send();
+            if(spi_flag)
+            {
+                get_add_cnt++;
+                add_pos += 5;
+            }
+            
+        }
+
+         while(get_add_cnt > 0)
+        {
+            // delay_ms(1);
+            // 设置can1线id为1的电机的位置
+            for(uint8_t i = 0; i < CAN1_NUM; i++)
+            {
+                uint8_t temp_id = 0x10 | (i+1); 
+                // printf("motor0x%02x pos:%d\n", temp_id, my_Driver.get_motor_state(temp_id).position);
+                my_Driver.set_motor_position(temp_id, init_pos[i] + add_pos);
+            }
+
+            for(uint8_t i = 0; i < CAN2_NUM; i++)
+            {
+                uint8_t temp_id = 0x20 | (i+1); 
+                // printf("motor0x%02x pos:%d\n", temp_id, my_Driver.get_motor_state(temp_id).position);
+                my_Driver.set_motor_position(temp_id, init_pos[i + CAN1_NUM] + add_pos);
+            }
+			
+            //发送指令
+            spi_flag = my_Driver.spi_send();
+            if(spi_flag)
+            if(spi_flag)
+            {
+                get_add_cnt--;
+                add_pos -= 5;
+            }
+            
+        }
+
+    }
+
+// while(1)
+// {
+        int32_t pos_add1[3] = {0};
+        int32_t pos_add2[3] = {0};
+        int32_t l_stp_up = 10;
+        int32_t r_stp_up = 10;
+
+        my_Driver.spi_send();
+        pos_add1[0] = my_Driver.get_motor_state(0x17).position;
+        pos_add1[1] = my_Driver.get_motor_state(0x18).position;
+        pos_add1[2] = my_Driver.get_motor_state(0x19).position;
+
+        pos_add2[0] = my_Driver.get_motor_state(0x27).position;
+        pos_add2[1] = my_Driver.get_motor_state(0x28).position;
+        pos_add2[2] = my_Driver.get_motor_state(0x29).position;
+
+
+        printf("%d,%d,%d\n%d,%d,%d\n",pos_add1[0],pos_add1[1],pos_add1[2],pos_add2[0],pos_add2[1],pos_add2[2]);
+// }
+        {
+            printf("arm\n");
+            for(int i=0;i<1200;i++)
+            {
+                for(int j=0;j<3;j++)
+                {
+                    my_Driver.set_motor_position(0x17+j, pos_add1[j]);
+                    my_Driver.set_motor_position(0x27+j, pos_add2[j]);
+                    pos_add1[j] +=  ((j==1)?(-l_stp_up):(l_stp_up));
+                    pos_add2[j] +=  ((j==1)?(r_stp_up):(-r_stp_up));
+                    my_Driver.spi_send();
+                    delay_ms(1);
+                }
+            }
+            for(int i=0;i<1200;i++)
+            {
+                for(int j=0;j<3;j++)
+                {
+                    my_Driver.set_motor_position(0x17+j, pos_add1[j]);
+                    my_Driver.set_motor_position(0x27+j, pos_add2[j]);
+                    pos_add1[j] -=  ((j==1)?(-l_stp_up):(l_stp_up));
+                    pos_add2[j] -=  ((j==1)?(r_stp_up):(-r_stp_up));
+                    my_Driver.spi_send();
+                    delay_ms(1);
+                }
+            }
+            
+            printf("arm  done\n");
+        }
+
+}
+
+int main()
+{
+    while(1)
+    {
+
+        joint_test();
+    }
+    
+    return 0;
+}

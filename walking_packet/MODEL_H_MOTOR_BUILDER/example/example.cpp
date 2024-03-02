@@ -1,0 +1,52 @@
+#include "Livelybot_Driver.h"
+#include <time.h>
+
+#define ALL_MOTOR_NUM (CAN1_NUM+CAN2_NUM)
+
+#define MYTIMES 100000
+
+//例子
+void delay_ms(int milliseconds) {
+    struct timespec ts;
+    ts.tv_sec = milliseconds / 1000;
+    ts.tv_nsec = ((milliseconds) % 1000) * 1000000;
+    nanosleep(&ts, NULL);
+}
+
+void joint_test(void)
+{
+    int32_t add_pos = 0;
+    imu_space_s imu_data;
+    motor_fb_space_s motor_state;
+    bool spi_flag = false;
+
+    //创建Liveltbot_Driver对象,传入参数
+    Livelybot_Driver my_Driver("/dev/spidev4.1");
+    
+    int32_t init_pos[ALL_MOTOR_NUM] = {0};
+    
+    for(uint8_t i = 0; i < CAN1_NUM; i++)
+    {
+        uint8_t temp_id = 0x10 | (i+1); 
+        init_pos[i] =  my_Driver.get_motor_state(temp_id).position;
+    }
+
+    for(uint8_t i = 0; i < CAN2_NUM; i++)
+    {
+        uint8_t temp_id = 0x20 | (i+1); 
+        init_pos[i + CAN1_NUM] =  my_Driver.get_motor_state(temp_id).position;
+    }
+    printf("\n");
+
+    delay_ms(2000);
+}
+
+int main()
+{
+    while(1)
+    {
+        joint_test();
+    }
+    
+    return 0;
+}

@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 11)
 find_package(Eigen3 REQUIRED)
 
 # Include directories
-include_directories("/usr/include/eigen3") #(${Eigen3_INCLUDE_DIRS})
+include_directories("/usr/include/eigen3") # for ubuntu
 
 # Add library
 add_library(model_h_leg_ik SHARED model_h_leg_ik.cpp)
