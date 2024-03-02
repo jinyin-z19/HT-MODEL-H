@@ -13,7 +13,7 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
         leg_lenth :: lap leg foot ankle(d L1 h1 h2)
         end_pos :: x(front) y(left) z(up) roll pitch yaw
     output:
-        st_leg_angle :: joint angle , theta 0 - 5
+        st_leg_angle :: joint angle , theta 0 - 5 in ID => model.png
     */
     Eigen::Matrix3d R_t;
     R_t = Eigen::AngleAxisd(end_pos[5], Eigen::Vector3d::UnitZ()) * 
@@ -42,10 +42,10 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
         st_leg_angle[3] = 0.0;
         theta_a = 0.0;}
 
-    // 4
+    // 4 - Y
     st_leg_angle[4] = theta_a + asin(da[0] / la);
         
-    // 5
+    // 5 - X
     st_leg_angle[5] = atan(- da[1] / (da[2] - leg_lenth[2]));
 
     // caculate self.theta 0 1 2
@@ -76,8 +76,8 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
        }
         
     // parallel ankle caculate reference -> git@github.com:rocketman123456/ros2_ws.git
-    double tx = st_leg_angle[4];
-    double ty = st_leg_angle[5];
+    double ty = st_leg_angle[4];
+    double tx = st_leg_angle[5];
     double d =  leg_lenth[3];
     double L1 = leg_lenth[4];
     double h1 = leg_lenth[5];
