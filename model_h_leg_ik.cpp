@@ -22,7 +22,7 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
     
     Eigen::Vector3d d_t(end_pos[0], end_pos[1], end_pos[2]);
     
-    //caculate self.theta 3 4 5
+    //caculate self.theta 3 1 0 (HT_ID: 14 12 11)
     Eigen::Matrix3d R_ti = R_t.transpose();
     Eigen::Vector3d d_3(0.0,0.0,leg_lenth[2]);
     Eigen::Vector3d da = - R_ti * d_t - d_3;
@@ -42,17 +42,17 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
         st_leg_angle[3] = 0.0;
         theta_a = 0.0;}
 
-    // 4 - Y
-    st_leg_angle[4] = theta_a + asin(da[0] / la);
+    // 1 - Y
+    st_leg_angle[1] = theta_a + asin(da[0] / la);
         
-    // 5 - X
-    st_leg_angle[5] = atan(- da[1] / (da[2] - leg_lenth[2]));
+    // 0 - X
+    st_leg_angle[0] = atan(- da[1] / (da[2] - leg_lenth[2]));
 
-    // caculate self.theta 0 1 2
-    Eigen::Matrix3d R_345;
-    R_345 = Eigen::AngleAxisd(st_leg_angle[5], Eigen::Vector3d::UnitX()) * 
-            Eigen::AngleAxisd(st_leg_angle[4] + st_leg_angle[3], Eigen::Vector3d::UnitY());
-    Eigen::Matrix3d Rlap = R_345.transpose() * R_ti;
+    // caculate self.theta  2 4 5
+    Eigen::Matrix3d R_013;
+    R_013 = Eigen::AngleAxisd(st_leg_angle[0], Eigen::Vector3d::UnitX()) * 
+            Eigen::AngleAxisd(st_leg_angle[1] + st_leg_angle[3], Eigen::Vector3d::UnitY());
+    Eigen::Matrix3d Rlap = R_013.transpose() * R_ti;
     
     //ZXY EULAR (YXZ Bryan)  
     double err = 0.001;
@@ -60,24 +60,24 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
     double ox = atan2(-Rlap(1,2), v_x.norm());
 
     if (ox >= PI/2 - err && ox <= PI/2 + err){
-       st_leg_angle[0] = atan2(Rlap(2,0), Rlap(0,0));
-       st_leg_angle[1] = PI/2;
+       st_leg_angle[5] = atan2(Rlap(2,0), Rlap(0,0));
+       st_leg_angle[4] = PI/2;
        st_leg_angle[2] = 0.0;
        }
     else if (ox >= -(PI/2) - err && ox <= -(PI/2) + err){
-       st_leg_angle[0] = atan2(-Rlap(2,0), -Rlap(0,0));
-       st_leg_angle[1] = -PI/2;
+       st_leg_angle[5] = atan2(-Rlap(2,0), -Rlap(0,0));
+       st_leg_angle[4] = -PI/2;
        st_leg_angle[2] = 0.0;
        }
     else{
-       st_leg_angle[0] = atan2(Rlap(1,0)/cos(ox), Rlap(1,1)/cos(ox));
-       st_leg_angle[1] = ox;
+       st_leg_angle[5] = atan2(Rlap(1,0)/cos(ox), Rlap(1,1)/cos(ox));
+       st_leg_angle[4] = ox;
        st_leg_angle[2] = atan2(Rlap(0,2)/cos(ox), Rlap(2,2)/cos(ox));
        }
         
     // parallel ankle caculate reference -> git@github.com:rocketman123456/ros2_ws.git
-    double ty = st_leg_angle[4];
-    double tx = st_leg_angle[5];
+    double ty = st_leg_angle[1];
+    double tx = st_leg_angle[0];
     double d =  leg_lenth[3];
     double L1 = leg_lenth[4];
     double h1 = leg_lenth[5];
@@ -103,17 +103,17 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
     if (LenL <= abs(CL) || LenR <= abs(CR))
     {
         cout<<"error ankle"<<endl;
-        st_leg_angle[4] = 0;
-        st_leg_angle[5] = 0;
+        st_leg_angle[1] = 0;
+        st_leg_angle[0] = 0;
     }
     else
     {
-        st_leg_angle[4] = asin(CL / LenL) - asin(AL / LenL);
-        st_leg_angle[5] = asin(CR / LenR) - asin(AR / LenR);
+        st_leg_angle[1] = asin(CL / LenL) - asin(AL / LenL);
+        st_leg_angle[0] = asin(CR / LenR) - asin(AR / LenR);
     }
     
     // parallel lap caculate
-    st_leg_angle[3] = st_leg_angle[3] - st_leg_angle[2];
+    st_leg_angle[3] = st_leg_angle[3] + st_leg_angle[2];
     
     // motor way
     for(int i = 0; i < 6; i++){
