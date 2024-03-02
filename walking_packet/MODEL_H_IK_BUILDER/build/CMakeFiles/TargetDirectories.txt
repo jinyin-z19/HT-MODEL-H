@@ -1,3 +1,0 @@
-/home/jinyin/HT-MODEL-H/build/CMakeFiles/rebuild_cache.dir
-/home/jinyin/HT-MODEL-H/build/CMakeFiles/edit_cache.dir
-/home/jinyin/HT-MODEL-H/build/CMakeFiles/model_h_leg_ik.dir
