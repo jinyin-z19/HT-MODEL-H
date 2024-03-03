@@ -7,7 +7,7 @@
 using namespace std;
 extern "C" {
 
-void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_leg_angle[]) {
+void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_leg_angle[], bool LorR) {
     /* 
     input:
         leg_lenth :: lap leg foot ankle(d L1 h1 h2)
@@ -81,8 +81,12 @@ void leg_ik(double leg_lenth[], double end_pos[], double motor_way[], double st_
     double d =  leg_lenth[3];
     double L1 = leg_lenth[4];
     double h1 = leg_lenth[5];
-    double h2 = leg_lenth[6];
-    
+    double h2 = leg_lenth[6]; 
+    if (LorR){
+    h1 = leg_lenth[6];
+    h2 = leg_lenth[5];
+    tx = -st_leg_angle[0];
+    } 
     double cx = cos(tx);
     double sx = sin(tx);
     double cy = cos(ty);

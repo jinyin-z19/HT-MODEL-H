@@ -13,10 +13,11 @@ from time import sleep
 import time
 
 if __name__ == "__main__":
-    leg = ModelHLegIK()
-    leg_r_ang = leg.LegIKMove("right", [0, 0, -0.30, 0, 0, 0])
+    leg_rc = ModelHLegIK()
+    leg_lc = ModelHLegIK()
+    leg_r_ang = leg_rc.LegIKMove('right', [0, 0, -0.30, 0, 0, 0]).copy()
     arm_r_ang = [0, -0.1, 0]
-    leg_l_ang = leg.LegIKMove("left", [0, 0, -0.30, 0, 0, 0])
+    leg_l_ang = leg_lc.LegIKMove('left', [0, 0, -0.30, 0, 0, 0]).copy()
     arm_l_ang = [0, 0.1, 0]
     command_list = leg_r_ang + arm_r_ang + leg_l_ang + arm_l_ang
     print(command_list)
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     zero_list[0] = 0.45
     zero_list[1] =-0.05
     zero_list[2] = 0.00
-    zero_list[3] = 0.00
+    zero_list[3] = 0.08
     zero_list[4] = 0.00
     zero_list[5] = 0.00
     
@@ -48,9 +49,6 @@ if __name__ == "__main__":
     zero_list[15] = 0.00
     zero_list[16] = 0.10
     zero_list[17] = 0.00
-    
-    ang_move = np.array(command_list) + np.array(zero_list)
+    ang_move = np.array(command_list)+ np.array(zero_list)
     mctl = ModelHCtl()
-    print(mctl.MotorCall())
-    print(ang_move)
     mctl.MotorSafeMove(ang_move.tolist())

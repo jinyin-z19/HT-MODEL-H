@@ -21,10 +21,11 @@ import ctypes
 lib = ctypes.CDLL('./walking_packet/MODEL_H_IK_BUILDER/build/libmodel_h_leg_ik.so')
 # Define the function argument and return types
 lib.leg_ik.argtypes = [
-    ctypes.c_double * 7,
-    ctypes.c_double * 6,
-    ctypes.c_double * 6,
-    ctypes.c_double * 6,
+    ctypes.c_double * 7, #length
+    ctypes.c_double * 6, # pose
+    ctypes.c_double * 6, # way
+    ctypes.c_double * 6, # ang
+    ctypes.c_bool 
 ]
 lib.leg_ik.restype = None
 
@@ -45,12 +46,14 @@ class ModelHLegIK:
         self.c_leg_len = (ctypes.c_double * 7)(*self.leg_rod_length)
         self.c_motor_way_l = (ctypes.c_double * 6)(*self.way_left)
         self.c_motor_way_r = (ctypes.c_double * 6)(*self.way_right)
+        self.c_left_or_right = (ctypes.c_bool)(True)
         # set pointer
         self.c_leg_ang_ptr = ctypes.pointer(self.c_leg_ang)
         self.c_end_pos_ptr = ctypes.pointer(self.c_end_pos)
         self.c_leg_len_ptr = ctypes.pointer(self.c_leg_len)
         self.c_motor_way_l_ptr = ctypes.pointer(self.c_motor_way_l)
-        self.c_motor_way_r_ptr = ctypes.pointer(self.c_motor_way_r)    
+        self.c_motor_way_r_ptr = ctypes.pointer(self.c_motor_way_r) 
+        self.c_left_or_right_ptr = ctypes.pointer(self.c_left_or_right)   
             
  
     def LegIKMove(self, LeftorRight, end_pos):
@@ -61,9 +64,11 @@ class ModelHLegIK:
             self.c_end_pos[index] = end_pos[index]
         # caculate 
         if (LeftorRight == 'Left' or LeftorRight == 'left'):
-            lib.leg_ik(self.c_leg_len, self.c_end_pos, self.c_motor_way_l, self.c_leg_ang)
+            self.c_left_or_right = False
+            lib.leg_ik(self.c_leg_len, self.c_end_pos, self.c_motor_way_l, self.c_leg_ang, self.c_left_or_right)
         else:
-            lib.leg_ik(self.c_leg_len, self.c_end_pos, self.c_motor_way_r, self.c_leg_ang)
+            self.c_left_or_right = True
+            lib.leg_ik(self.c_leg_len, self.c_end_pos, self.c_motor_way_r, self.c_leg_ang, self.c_left_or_right)
         theta = ctypes.cast(self.c_leg_ang_ptr, ctypes.POINTER(ctypes.c_double * 6)).contents
         for index in range(6):
             self.leg_ang[index] = theta[index]
