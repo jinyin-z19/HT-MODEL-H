@@ -21,7 +21,7 @@ void joints_move(float angle[])
         int32_t num = my_Driver.transfer_send(RAD2POS, angle[i + CAN1_NUM]);
         my_Driver.set_motor_position(temp_id, num);
     } 
-       
+    my_Driver.spi_send();   
 }
 
 void joints_state(float angle[])

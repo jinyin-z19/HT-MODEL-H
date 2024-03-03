@@ -46,6 +46,8 @@ class ModelHCtl:
                
 if __name__ == '__main__':
     mctl = ModelHCtl()
+    ang_move = mctl.MotorCall()
     print(mctl.MotorCall())
+    mctl.MotorMove(ang_move)
     
 
