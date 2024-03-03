@@ -17,10 +17,9 @@ if __name__ == "__main__":
     leg_lc = ModelHLegIK()
     leg_r_ang = leg_rc.LegIKMove('right', [0, 0, -0.30, 0, 0, 0]).copy()
     arm_r_ang = [0, -0.1, 0]
-    leg_l_ang = leg_lc.LegIKMove('left', [0, 0, -0.30, 0, 0, 0]).copy()
+    leg_l_ang = leg_lc.LegIKMove('left', [0.05, 0, -0.30, 0, 0, 0]).copy()
     arm_l_ang = [0, 0.1, 0]
     command_list = leg_r_ang + arm_r_ang + leg_l_ang + arm_l_ang
-    print(command_list)
     # -- stand leg zero position --    
     zero_list = [0] * 18
     
@@ -50,5 +49,8 @@ if __name__ == "__main__":
     zero_list[16] = 0.10
     zero_list[17] = 0.00
     ang_move = np.array(command_list)+ np.array(zero_list)
+    print(ang_move)
     mctl = ModelHCtl()
-    mctl.MotorSafeMove(ang_move.tolist())
+    for i in range(100):
+      mctl.MotorSafeMove(ang_move.tolist())
+      sleep(0.05)

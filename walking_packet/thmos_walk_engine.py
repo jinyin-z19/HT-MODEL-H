@@ -156,20 +156,21 @@ class walking():
     # add com offset
     left_foot  = [lo[0,0] + self.com_x_offset , lo[0,1] + self.com_y_offset + self.ex_foot_width, self.left_up -  self.trunk_height, 0.0, 0.0, lo[0,2]]
     right_foot = [ro[0,0] + self.com_x_offset , ro[0,1] + self.com_y_offset - self.ex_foot_width, self.right_up - self.trunk_height, 0.0, 0.0, ro[0,2]]
-
+    
+    print("left",left_foot)
+    print("right",right_foot)
     # ik caculate
-    l_joint_angles = self.kinematic.LegIKMove('left',left_foot)
-    r_joint_angles = self.kinematic.LegIKMove('right',right_foot)
-
+    l_joint_angles = self.kinematic.LegIKMove('left',left_foot).copy()
+    r_joint_angles = self.kinematic.LegIKMove('right',right_foot).copy()
+    
     # add trunk pitch
     l_joint_angles[1] -= self.trunk_pitch
     r_joint_angles[1] += self.trunk_pitch
-    self.joint_angles = r_joint_angles + l_joint_angles  # R angle first
     
     # loop
     self.now_frame += 1
 
-    return self.joint_angles, (self.period_frames - self.now_frame)
+    return r_joint_angles, l_joint_angles, (self.period_frames - self.now_frame)
   
   def walking_state_machine(self):
     """
