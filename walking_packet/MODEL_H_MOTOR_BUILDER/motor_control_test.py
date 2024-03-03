@@ -21,7 +21,7 @@ class ModelHCtl:
         self.motor_ang = [0] * 18
         self.c_motor_ang = (ctypes.c_float * 18)(*self.motor_ang)
         # set pointer
-        self.c_motor_ang = ctypes.pointer(self.c_motor_ang)   
+        self.c_motor_ang_ptr = ctypes.pointer(self.c_motor_ang)   
             
  
     def MotorMove(self, tar_motor_ang):
@@ -38,14 +38,14 @@ class ModelHCtl:
         motors pos callback
         """
         lib.joints_state(self.c_motor_ang)       
-        theta = ctypes.cast(self.c_motor_ang, ctypes.POINTER(ctypes.c_float * 18)).contents
-        for index in range(6):
+        theta = ctypes.cast(self.c_motor_ang_ptr, ctypes.POINTER(ctypes.c_float * 18)).contents
+        for index in range(18):
             self.motor_ang[index] = theta[index]
-        return self.leg_ang
+        return self.motor_ang
         
                
 if __name__ == '__main__':
     mctl = ModelHCtl()
-    print(mctl.MotorCall)
+    print(mctl.MotorCall())
     
 

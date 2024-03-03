@@ -260,7 +260,7 @@ float Livelybot_Driver::transfer_rec(tranfer_rec_type_e type, int32_t data)
         res = (float)(data / 100000.0) * 360.0;
         return res; 
     case POS2RAD:
-        res = data / 100000 * (2 * PI);
+        res = (float)(data / 100000.0) * (2 * PI);
         return res; 
     default:
         

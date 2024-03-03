@@ -31,18 +31,19 @@ void joint_test(void)
         uint8_t temp_id = 0x10 | (i+1); 
         init_pos[i] =  my_Driver.get_motor_state(temp_id).position;
         printf("m0x%02x: %d\t", temp_id, init_pos[i]);
-        my_Driver.set_motor_position(temp_id, init_pos[i]);
+        //my_Driver.set_motor_position(temp_id, init_pos[i]);
     }
     for(uint8_t i = 0; i < CAN2_NUM; i++)
     {
         uint8_t temp_id = 0x20 | (i+1); 
         init_pos[i + CAN1_NUM] =  my_Driver.get_motor_state(temp_id).position;
         printf("m0x%02x: %d\t", temp_id, init_pos[i + CAN1_NUM]);
-        my_Driver.set_motor_position(temp_id, init_pos[i + CAN1_NUM]);
+        //my_Driver.set_motor_position(temp_id, init_pos[i + CAN1_NUM]);
     }
-    printf("\n");   
+    printf("\n");  
+    delay_ms(2000); 
     //发送指令 - bug start
-    spi_flag = my_Driver.spi_send();   
+    //spi_flag = my_Driver.spi_send();   
     // init --finish--
     
     // goto zero --start--
