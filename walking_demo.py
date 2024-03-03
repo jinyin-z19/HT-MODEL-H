@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
 import numpy as np
 import sys
 sys.path.append('./walking_packet')
